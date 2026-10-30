@@ -1,0 +1,66 @@
+name: Build Grocery Tracker Android APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Install dependencies and bundle offline features
+        run: |
+          npm install
+          npm run prepare:web
+      - name: Create Android platform if needed
+        run: test -d android || npx cap add android
+      - name: Generate Android launcher and splash assets
+        run: npx capacitor-assets generate --android
+      - name: Sync Capacitor plugins and bundled assets
+        run: npx cap sync android
+      - name: Set app version
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('android/app/build.gradle')
+          s=p.read_text()
+          import re
+          s=re.sub(r'versionCode\s+\d+', 'versionCode 24', s, count=1)
+          s=re.sub(r'versionName\s+"[^"]+"', 'versionName "2.3.1"', s, count=1)
+          p.write_text(s)
+          print('Configured Grocery Tracker v2.3.1')
+          PY
+      - name: Build debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Grocery-Tracker-Android-v2.3.1-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+      - name: Publish versioned APK release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v2.3.1-build-${{ github.run_number }}
+          name: Grocery Tracker v2.3.1 (build ${{ github.run_number }})
+          prerelease: true
+          files: android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Upload build reports if failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Grocery-Tracker-v2.3.1-build-reports
+          path: android/app/build/reports
+          if-no-files-found: ignore
