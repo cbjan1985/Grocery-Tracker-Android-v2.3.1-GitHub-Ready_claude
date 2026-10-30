@@ -1,0 +1,16 @@
+{
+  "appId": "com.cb.grocerytracker",
+  "appName": "Grocery Tracker",
+  "webDir": "www",
+  "android": { "allowMixedContent": false },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "backgroundColor": "#FAF8F3",
+      "androidScaleType": "CENTER_INSIDE",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": false
+    }
+  }
+}

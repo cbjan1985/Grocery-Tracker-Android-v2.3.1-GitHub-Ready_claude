@@ -1,0 +1,24 @@
+{
+  "name": "grocery-tracker-android",
+  "version": "2.3.1",
+  "private": true,
+  "description": "Grocery Tracker Android app by CB, offline-first Capacitor app",
+  "scripts": {
+    "prepare:web": "mkdir -p www/vendor && cp node_modules/xlsx/dist/xlsx.full.min.js www/vendor/xlsx.full.min.js && esbuild native-bridge-src.js --bundle --platform=browser --format=iife --outfile=www/native-bridge.js",
+    "sync": "npm run prepare:web && cap sync android",
+    "open": "cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/filesystem": "^6.0.3",
+    "@capacitor/share": "^6.0.3",
+    "@capacitor/splash-screen": "^6.0.3",
+    "xlsx": "0.18.5"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^6.1.2",
+    "esbuild": "^0.24.0"
+  }
+}
